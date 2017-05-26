@@ -6,6 +6,9 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,7 +32,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         //title but first must extend the appcompat
-       // getSupportActionBar().setTitle("Maps Project");
+        // getSupportActionBar().setTitle("Maps Project");
     }
 
 
@@ -44,7 +47,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        
+
         mMap = googleMap;
         googleMap.setMyLocationEnabled(true);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -55,7 +58,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng birthPlace = new LatLng(32.7157, -117.161);
         mMap.addMarker(new MarkerOptions().position(birthPlace).title("Born Here"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(birthPlace));
+
+        mMap.setMyLocationEnabled(true);
     }
 
+
+    private int numClicks = 0;
+
+    public void changeView(View v){
+        numClicks++;
+
+        if (numClicks%2==0) {
+            mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        }
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+    }
 
 }
