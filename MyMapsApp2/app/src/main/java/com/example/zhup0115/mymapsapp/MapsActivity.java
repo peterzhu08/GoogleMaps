@@ -57,14 +57,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
         mMap = googleMap;
-        googleMap.setMyLocationEnabled(true);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
         }
-        // Add a marker in Sydney and move the camera
+
+     /*   if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED) {
+            Log.d("MyMapsApp", "Failed Permission check 2");
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, 2);
+        }*/
+
+        // Add a marker in SD and move the camera
         LatLng birthPlace = new LatLng(32.7157, -117.161);
         mMap.addMarker(new MarkerOptions().position(birthPlace).title("Born Here"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(birthPlace));
@@ -73,7 +79,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    private int numClicks = 0;
+    private int numClicks = 3;
 
     public void changeView(View v) {
         numClicks++;
@@ -163,7 +169,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
-                myLocation = locationManager.getLastKnownLocation("GPS");
+                myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             }
             if (myLocation == null) {
                 //Display a message via logd and or toast
@@ -284,7 +290,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
-                myLocation = locationManager.getLastKnownLocation("Network");
+                myLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             }
             if (myLocation == null) {
                 //Display a message via logd and or toast
@@ -297,7 +303,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 //drop marker
                 //if using circles, reference android circle class
-                Circle circle = mMap.addCircle(new CircleOptions().center(userLocation).radius(1).strokeColor(Color.RED).strokeWidth(2).fillColor(Color.RED));
+                Circle circle = mMap.addCircle(new CircleOptions().center(userLocation).radius(1).strokeColor(Color.BLUE).strokeWidth(2).fillColor(Color.BLUE));
                 mMap.animateCamera(update);
             }
 
@@ -331,10 +337,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     };
 
+    private int numTrack = 3;
     public void track (View v){
-        Log.d("MyMaps","Tracking On");
-        Toast.makeText(MapsActivity.this,"Tracking On", Toast.LENGTH_SHORT).show();
-        
+        numTrack++;
+        if(numTrack%2==0) {
+            Log.d("MyMaps", "Tracking On");
+            Toast.makeText(MapsActivity.this, "Tracking On", Toast.LENGTH_SHORT).show();
+            getLocation();
+        }
+        else{
+            locationManager.removeUpdates(LocationListenerGPS);
+            locationManager.removeUpdates(LocationListenerNetwork);
+        }
 
     }
 }

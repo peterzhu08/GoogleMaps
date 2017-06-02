@@ -36,6 +36,18 @@
                 android:id="@+id/button"
                 android:onClick="changeView" />
 
-        </LinearLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Search"
+            android:id="@+id/button3" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editText"
+            android:text="Search For..." />
+
+    </LinearLayout>
 
 </RelativeLayout>
