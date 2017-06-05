@@ -11,13 +11,16 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="460dp"
-        tools:context="com.example.zhup0115.mymapsapp.MapsActivity" />
+        tools:context="com.example.zhup0115.mymapsapp.MapsActivity"
+        android:layout_below="@+id/button3"
+        android:layout_above="@+id/linearLayout" />
 
     <LinearLayout
         android:layout_alignParentBottom="true"
         android:weightSum="2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout">
 
             <Button
                 android:weightSum="1"
@@ -39,15 +42,26 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Search"
-            android:id="@+id/button3" />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/editText"
-            android:text="Search For..." />
+            android:text="Clear Markers"
+            android:id="@+id/button4"
+            android:onClick="clearButton" />
 
     </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Search"
+        android:id="@+id/button3"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText"
+        android:text="Search For..."
+        android:layout_alignBottom="@+id/button3"
+        android:layout_toEndOf="@+id/button3" />
 
 </RelativeLayout>

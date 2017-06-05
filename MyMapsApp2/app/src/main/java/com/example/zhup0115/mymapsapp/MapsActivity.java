@@ -213,8 +213,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //case LocationProvider.TEMPORARILY_UNAVAILABLE --> request updates from network provider
             //case default --> request updates from network provider
             switch (status) {
-                case 1:
-                    status = LocationProvider.AVAILABLE;
+                case 1: status = LocationProvider.AVAILABLE;
                     Log.d("MyMaps", "Location Provider Available");
                     Toast.makeText(MapsActivity.this, "Location Provider Available", Toast.LENGTH_SHORT).show();
                     break;
@@ -319,6 +318,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 return;
             }
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListenerNetwork);
+
         }
 
         @Override
@@ -346,10 +346,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             getLocation();
         }
         else{
-            locationManager.removeUpdates(LocationListenerGPS);
-            locationManager.removeUpdates(LocationListenerNetwork);
+            Log.d("MyMaps", "Tracking Off");
+            Toast.makeText(MapsActivity.this, "Tracking Off", Toast.LENGTH_SHORT).show();
+            mMap.clear();
         }
+    }
 
+    public void clearButton (View v){
+        mMap.clear();
     }
 }
 
