@@ -54,14 +54,25 @@
         android:text="Search"
         android:id="@+id/button3"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:nestedScrollingEnabled="false"
+        android:onClick="searchNOTfive" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editText"
+        android:id="@+id/EditSearch"
         android:text="Search For..."
         android:layout_alignBottom="@+id/button3"
-        android:layout_toEndOf="@+id/button3" />
+        android:layout_toEndOf="@+id/button5" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Search 5"
+        android:id="@+id/button5"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/button3"
+        android:onClick="searchFive" />
 
 </RelativeLayout>

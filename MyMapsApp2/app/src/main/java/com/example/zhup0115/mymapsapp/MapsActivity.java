@@ -7,6 +7,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -14,9 +16,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
-
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -28,9 +34,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+import java.util.List;
+
+public class MapsActivity extends FragmentActivity
+        implements OnMapReadyCallback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener{
 
     private GoogleMap mMap;
+    EditText EditSearch;
+    GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +54,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        //title but first must extend the appcompat
-        // getSupportActionBar().setTitle("Maps Project");
+        EditSearch = (EditText)(findViewById(R.id.EditSearch));
+
+
     }
 
 
@@ -213,12 +227,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //case LocationProvider.TEMPORARILY_UNAVAILABLE --> request updates from network provider
             //case default --> request updates from network provider
             switch (status) {
-                case 1: status = LocationProvider.AVAILABLE;
+                case LocationProvider.AVAILABLE:
                     Log.d("MyMaps", "Location Provider Available");
                     Toast.makeText(MapsActivity.this, "Location Provider Available", Toast.LENGTH_SHORT).show();
                     break;
-                case 2:
-                    status = LocationProvider.OUT_OF_SERVICE;
+                case LocationProvider.OUT_OF_SERVICE:
                     if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         // TODO: Consider calling
                         //    ActivityCompat#requestPermissions
@@ -231,7 +244,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListenerGPS);
                     break;
-                case 3:  status = LocationProvider.TEMPORARILY_UNAVAILABLE;
+                case LocationProvider.TEMPORARILY_UNAVAILABLE:
                     if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         // TODO: Consider calling
                         //    ActivityCompat#requestPermissions
@@ -337,6 +350,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     };
 
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        mGoogleApiClient.connect();
+    }
+
     private int numTrack = 3;
     public void track (View v){
         numTrack++;
@@ -349,11 +371,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d("MyMaps", "Tracking Off");
             Toast.makeText(MapsActivity.this, "Tracking Off", Toast.LENGTH_SHORT).show();
             mMap.clear();
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, (com.google.android.gms.location.LocationListener) this);
         }
     }
 
     public void clearButton (View v){
         mMap.clear();
+    }
+
+    private List<Place> placesNOTfive;
+    private List<Place> placesFive;
+/*
+    public void searchNOTfive (){
+        List<Place> places = client.getPlacesByQuery(EditSearch, GooglePlaces.MAXIMUM_RESULTS);
+
+    }
+
+    public void searchFive (){
+        List<Place> places = client.getPlacesByQuery(EditSearch, GooglePlaces.MAXIMUM_RESULTS);
+
+    }*/
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 }
 
