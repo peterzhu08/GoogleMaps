@@ -162,6 +162,42 @@ public class MapsActivity extends FragmentActivity
     private Location myLocation;
     private static final int MY_LOC_ZOOM_FACTOR = 17;
 
+    public void dropMarker(String provider) {
+
+        LatLng userLocation = null;
+
+        if (locationManager != null) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            myLocation = locationManager.getLastKnownLocation(provider);
+        }
+
+        if (myLocation == null) {
+
+            Log.d("MyMaps", "dropMarker: myLocation is null");
+
+        } else {
+            userLocation = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+            //toast of coordinates
+            Toast.makeText(MapsActivity.this, "" + myLocation.getLatitude() + ", " + myLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+
+            CameraUpdate update = CameraUpdateFactory.newLatLngZoom(userLocation, MY_LOC_ZOOM_FACTOR);
+
+            Circle circle;
+
+            if (circleColor == true) {
+                circle = mMap.addCircle(new CircleOptions().center(userLocation).radius(1).strokeColor(Color.BLUE).strokeWidth(2).fillColor(Color.BLUE));
+                Log.d("MyMaps", "GPS-BLUE");
+            } else if (circleColor == false) {
+                circle = mMap.addCircle(new CircleOptions().center(userLocation).radius(1).strokeColor(Color.RED).strokeWidth(2).fillColor(Color.RED));
+                Log.d("MyMaps", "NETWORK-RED");
+            }
+
+            mMap.animateCamera(update);
+        }
+
+    }
 
     android.location.LocationListener locationListenerGPS = new android.location.LocationListener() {
         @Override
@@ -171,34 +207,7 @@ public class MapsActivity extends FragmentActivity
             Toast.makeText(MapsActivity.this, "GPS Enabled", Toast.LENGTH_SHORT).show();
 
             //drop a marker on the map - create a method called dropAMarker
-            LatLng userLocation = null;
-            if (locationManager != null) {
-                if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            }
-            if (myLocation == null) {
-                //Display a message via logd and or toast
-            } else {
-                //get the user location
-                userLocation = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-
-                //display a user message with the lat and long
-                CameraUpdate update = CameraUpdateFactory.newLatLngZoom(userLocation, MY_LOC_ZOOM_FACTOR);
-
-                //drop marker
-                //if using circles, reference android circle class
-                Circle circle = mMap.addCircle(new CircleOptions().center(userLocation).radius(1).strokeColor(Color.RED).strokeWidth(2).fillColor(Color.RED));
-                mMap.animateCamera(update);
-            }
+            dropMarker(LocationManager.GPS_PROVIDER);
 
             //remove the network location update hint: see locationManager for update removal method
             if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -211,6 +220,7 @@ public class MapsActivity extends FragmentActivity
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
+            circleColor = true;
             locationManager.removeUpdates(locationListenerNetwork);
 
         }
@@ -282,56 +292,18 @@ public class MapsActivity extends FragmentActivity
         }
     };
 
+    private boolean circleColor = false;
     android.location.LocationListener locationListenerNetwork = new android.location.LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            //output in Log.d and toast that Network is enabled and working
-            Log.d("MyMaps", "Network Enabled");
-            Toast.makeText(MapsActivity.this,"Network Enabled", Toast.LENGTH_SHORT).show();
+            Log.d("MyMaps", "Network Location has changed");
+            Toast.makeText(MapsActivity.this, "Network Location has changed", Toast.LENGTH_SHORT).show();
 
-            //Drop a marker on map - create a method called Drop a marker
-            LatLng userLocation = null;
-            if (locationManager != null) {
-                if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                myLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            }
-            if (myLocation == null) {
-                //Display a message via logd and or toast
-            } else {
-                //get the user location
-                userLocation = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+            //drops a marker on map
+            dropMarker(LocationManager.NETWORK_PROVIDER);
+            Log.d("MyMaps", "called dropmarker() method from network");
 
-                //display a user message with the lat and long
-                CameraUpdate update = CameraUpdateFactory.newLatLngZoom(userLocation, MY_LOC_ZOOM_FACTOR);
-
-                //drop marker
-                //if using circles, reference android circle class
-                Circle circle = mMap.addCircle(new CircleOptions().center(userLocation).radius(1).strokeColor(Color.BLUE).strokeWidth(2).fillColor(Color.BLUE));
-                mMap.animateCamera(update);
-            }
-
-            //relaunch the network provider request (requestLocationUpdates (NETWORK_PROVIDER))
-            if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListenerNetwork);
-
+            circleColor = false;
         }
 
         @Override
@@ -359,20 +331,27 @@ public class MapsActivity extends FragmentActivity
         mGoogleApiClient.connect();
     }
 
+    public void trackingOff(View v) {
+        Log.d("MyMaps", "Tracking Off");
+        isGPSenabled = !isGPSenabled;
+        isNetworkEnabled = !isNetworkEnabled;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        locationManager.removeUpdates(locationListenerNetwork);
+        Toast.makeText(this, "Tracking Off", Toast.LENGTH_SHORT).show();
+    }
     private int numTrack = 3;
-    public void track (View v){
+    public void track(View view) {
         numTrack++;
         if(numTrack%2==0) {
-            Log.d("MyMaps", "Tracking On");
-            Toast.makeText(MapsActivity.this, "Tracking On", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MapsActivity.this, "Currently getting your location", Toast.LENGTH_SHORT).show();
             getLocation();
         }
-        else{
-            Log.d("MyMaps", "Tracking Off");
-            Toast.makeText(MapsActivity.this, "Tracking Off", Toast.LENGTH_SHORT).show();
-            mMap.clear();
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, (com.google.android.gms.location.LocationListener) this);
+        else {
+            trackingOff(view);
         }
+
     }
 
     public void clearButton (View v){
