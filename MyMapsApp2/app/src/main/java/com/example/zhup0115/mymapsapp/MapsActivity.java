@@ -3,6 +3,8 @@ package com.example.zhup0115.mymapsapp;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -34,6 +36,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity
@@ -58,7 +62,6 @@ public class MapsActivity extends FragmentActivity
 
 
     }
-
 
     /**
      * Manipulates the map once available.
@@ -93,7 +96,7 @@ public class MapsActivity extends FragmentActivity
     }
 
 
-    private int numClicks = 3;
+    private int numClicks = 1;
 
     public void changeView(View v) {
         numClicks++;
@@ -113,18 +116,6 @@ public class MapsActivity extends FragmentActivity
                 .addApi(LocationServices.API)
                 .build();
         mGoogleApiClient.connect();
-}
-    private List<Place> placesNOTfive;
-    private List<Place> placesFive;
-
-    public void searchNOTfive (){
-        List<Place> places = client.getPlacesByQuery(EditSearch, GooglePlaces.MAXIMUM_RESULTS);
-
-    }
-
-    public void searchFive (){
-        List<Place> places = client.getPlacesByQuery(EditSearch, GooglePlaces.MAXIMUM_RESULTS);
-
     }
 
     @Override
@@ -141,7 +132,7 @@ public class MapsActivity extends FragmentActivity
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
-    private boolean dotColor = false;
+    private boolean MarkerColor = false;
     private LocationManager locationManager;
     private boolean isGpsEnabled = false;
     private boolean isNetworkEnabled = false;
@@ -197,12 +188,12 @@ public class MapsActivity extends FragmentActivity
 
     }
 
-    private int isTracking = 0;
+    private int isTracking = 1;
     public void track(View v) {
         isTracking++;
 
 
-        if (isTracking % 2 == 1) {
+        if (isTracking % 2 == 0) {
             Log.d("MyMaps", "Tracking on");
             Toast.makeText(MapsActivity.this, "Tracking on", Toast.LENGTH_SHORT).show();
             getLocation();
@@ -223,7 +214,6 @@ public class MapsActivity extends FragmentActivity
             Toast.makeText(MapsActivity.this, "track: remove updates", Toast.LENGTH_SHORT);
 
         }
-
     }
 
     LocationListener locationListenerGPS = new LocationListener() {
@@ -242,7 +232,7 @@ public class MapsActivity extends FragmentActivity
                 return;
             }
             locationManager.removeUpdates(locationListenerNetwork);
-            dotColor = true;
+            MarkerColor = true;
 
         }
 
@@ -292,7 +282,7 @@ public class MapsActivity extends FragmentActivity
             dropMarker(LocationManager.NETWORK_PROVIDER);
             Log.d("MyMaps", "called dropmarker() method from network");
 
-            dotColor = false;
+            MarkerColor = false;
         }
 
         @Override
@@ -325,7 +315,7 @@ public class MapsActivity extends FragmentActivity
 
         if (myLocation == null) {
 
-            Log.d("MyMaps", "dropMarker: myLocation is null");
+            Log.d("MyMaps", "myLocation is null");
 
         } else {
             userLocation = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
@@ -336,12 +326,12 @@ public class MapsActivity extends FragmentActivity
 
             Circle circle;
 
-            if (dotColor == true) {
+            if (MarkerColor == true) {
                 circle = mMap.addCircle(new CircleOptions().center(userLocation).radius(1).strokeColor(Color.BLUE).strokeWidth(2).fillColor(Color.BLUE));
-                Log.d("MyMaps", "GPS-BLUE");
-            } else if (dotColor == false) {
+                Log.d("MyMaps", "GPS");
+            } else if (MarkerColor == false) {
                 circle = mMap.addCircle(new CircleOptions().center(userLocation).radius(1).strokeColor(Color.RED).strokeWidth(2).fillColor(Color.RED));
-                Log.d("MyMaps", "NETWORK-RED");
+                Log.d("MyMaps", "NETWORK");
             }
 
             mMap.animateCamera(update);
@@ -352,6 +342,87 @@ public class MapsActivity extends FragmentActivity
     public void clearButton (View v)
     {
         mMap.clear();
+    }
+
+    public void search5 (View v) {
+        String location = EditSearch.getText().toString();
+        List<Address> addressList = new ArrayList<>();
+        List<Address> distanceList = new ArrayList<>();
+
+        if (location.equals("")) {
+            Toast.makeText(MapsActivity.this, "No Search Entered", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (location != null || !location.equals("")) {
+            Log.d("MyMaps", "search feature started");
+            Geocoder geocoder = new Geocoder(this);
+            try {
+                addressList = geocoder.getFromLocationName(location, 100);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        double dist = //FILL IN METHOD OR SOMETHING
+
+        for (int i = 0; i < addressList.size(); i++) {
+            Address currentAddress = addressList.get(i);
+
+
+
+            //adds 5 mile radius
+            Log.d("MyMaps","checking to see if radius is less than 5");
+            if (dist <= 5) {
+                distanceList.add(addressList.get(i));
+                Log.d("MyMaps", "radius is less than 5 and added it to distanceList");
+            } else {
+                Log.d("MyMaps","distance is not less than 5");
+            }
+        }
+
+        if (distanceList.size() == 0) {
+            Log.d("MyMaps", "no search results found");
+            Toast.makeText(MapsActivity.this, "No search results within 5 miles", Toast.LENGTH_SHORT).show();
+        }
+
+        for (int i = 0; i < distanceList.size(); i++) {
+
+            Address address = distanceList.get(i);
+            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(latLng).title("Search Results"));
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+        }
+    }
+    public void search(View v){
+        String location = EditSearch.getText().toString();
+        List<Address> addressList = new ArrayList<>();
+        List<Address> distanceList = new ArrayList<>();
+
+        if (location.equals("")) {
+            Toast.makeText(MapsActivity.this, "No Search Entered", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (location != null || !location.equals("")) {
+            Log.d("MyMaps", "search feature started");
+            Geocoder geocoder = new Geocoder(this);
+            try {
+                addressList = geocoder.getFromLocationName(location, 100);
+                distanceList = addressList;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (distanceList.size() == 0) {
+            Log.d("MyMaps", "no search results found");
+            Toast.makeText(MapsActivity.this, "No search results within 5 miles", Toast.LENGTH_SHORT).show();
+        }
+
+        for (int i = 0; i < distanceList.size(); i++) {
+
+            Address address = distanceList.get(i);
+            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(latLng).title("Search Results"));
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+        }
     }
 }
 
