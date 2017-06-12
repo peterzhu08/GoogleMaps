@@ -41,9 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity
-        implements OnMapReadyCallback,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener{
+        implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     EditText EditSearch;
@@ -76,11 +74,6 @@ public class MapsActivity extends FragmentActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            googleMap.setMyLocationEnabled(true);
-        }
-
      /*   if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED) {
             Log.d("MyMapsApp", "Failed Permission check 2");
@@ -92,7 +85,6 @@ public class MapsActivity extends FragmentActivity
         mMap.addMarker(new MarkerOptions().position(birthPlace).title("Born Here"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(birthPlace));
 
-        mMap.setMyLocationEnabled(true);
     }
 
 
@@ -107,31 +99,7 @@ public class MapsActivity extends FragmentActivity
             mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         }
     }
-
-
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
+//LMAO PETER ZHU IS A SCUB
     private boolean MarkerColor = false;
     private LocationManager locationManager;
     private boolean isGpsEnabled = false;
@@ -141,7 +109,7 @@ public class MapsActivity extends FragmentActivity
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 5;
 
     public void getLocation() {
-
+// HI I AM PETER AND I AM REALLY KOL
         try {
             locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
@@ -165,7 +133,7 @@ public class MapsActivity extends FragmentActivity
                 if (isGpsEnabled == true) {
                     Log.d("MyMaps", "getLocation: GPS enabled & requesting location updates");
                     if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        return;
+                        return; // HORRAY IT IS THE END OF SCHOOL AND I AM PETER
                     }
                     Log.d("MyMaps", "Permissions granted");
                     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BETWEEN_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListenerGPS);
@@ -174,12 +142,12 @@ public class MapsActivity extends FragmentActivity
                 }
                 if (isNetworkEnabled == true) {
                     Log.d("MyMaps", "getLocation: Network enabled & requesting location updates");
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BETWEEN_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListenerNetwork);
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BETWEEN_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListenerNetwork);//I AM PETER AND I AM GRADUATING. IF I WAS RUSSIAN, YOU COULD CALL ME A... PETRAGRAD!!!
                     Log.d("MyMaps", "getLocation: Network update request is happening");
                     Toast.makeText(this, "Currently Using Network", Toast.LENGTH_SHORT).show();
 
                 }
-
+//hi peter
             }
         } catch (Exception e) {
             Log.d("MyMaps", "Caught an exception in getLocation");
@@ -191,7 +159,7 @@ public class MapsActivity extends FragmentActivity
     private int isTracking = 1;
     public void track(View v) {
         isTracking++;
-
+        //is it Tracking??? Is it peter?????
 
         if (isTracking % 2 == 0) {
             Log.d("MyMaps", "Tracking on");
@@ -207,7 +175,7 @@ public class MapsActivity extends FragmentActivity
                 Log.d("MyMaps", "Permission check failed");
                 Toast.makeText(MapsActivity.this, "Permission check failed", Toast.LENGTH_SHORT);
                 return;
-            }
+            }//The following block of code will remove Updates from the location manager. I believe that this is a truly important segment of code and I am glad to have had the oppertunity to discuss it with all of my dearest friends
             locationManager.removeUpdates(locationListenerNetwork);
             locationManager.removeUpdates(locationListenerGPS);
             Log.d("MyMaps", "track: remove updates");
@@ -221,11 +189,11 @@ public class MapsActivity extends FragmentActivity
         public void onLocationChanged(Location location) {
             Log.d("MyMaps", "GPS Location has changed");
             Toast.makeText(MapsActivity.this, "GPS Location has changed", Toast.LENGTH_SHORT).show();
-
+            //The following segment of code drops a marker on the map
             //drops a marker on the map
             dropMarker(LocationManager.GPS_PROVIDER);
             Log.d("MyMaps", "dropped marker for GPS");
-
+            //the following block of code disables network updates
             // disable network updates
             if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
@@ -235,7 +203,7 @@ public class MapsActivity extends FragmentActivity
             MarkerColor = true;
 
         }
-
+        //The following method is a method called "onStatusChanged
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
 
@@ -362,7 +330,7 @@ public class MapsActivity extends FragmentActivity
             }
         }
 
-        double dist = //FILL IN METHOD OR SOMETHING
+        double dist = Geocoder::Calculations.distance_between([getLatitude()], [getLongitude()], [getLatitude()] , [getLocation()]);
 
         for (int i = 0; i < addressList.size(); i++) {
             Address currentAddress = addressList.get(i);
@@ -373,7 +341,7 @@ public class MapsActivity extends FragmentActivity
             Log.d("MyMaps","checking to see if radius is less than 5");
             if (dist <= 5) {
                 distanceList.add(addressList.get(i));
-                Log.d("MyMaps", "radius is less than 5 and added it to distanceList");
+                Log.d("MyMaps", "radius is less than or equal to 5 and added it to distanceList");
             } else {
                 Log.d("MyMaps","distance is not less than 5");
             }
